@@ -1,0 +1,109 @@
+---
+- name: deploy docker
+  hosts: all
+  tasks:
+        - name: install yum-utils
+          yum:
+                name:
+                          - yum-utils
+                          - device-mapper-persistent-data
+                          - lvm2
+                state: latest
+
+        - name: add docker repo
+          shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+        - name: install docer-ce
+          yum:
+                 name: docker-ce
+                 state: present
+
+        - name: start enable docker
+          service:
+                 name: docker
+                 state: started
+                 enabled: yes
+
+        - name: restart
+          shell: sudo systemctl daemon-reload && sudo systemctl restart docker
+          tags: restart
+
+        - name: check docker install
+          shell: docker -v
+          register: shell_result
+
+        - debug:
+            var: shell_result.stdout_lines
+
+        - name: create a directory to store code
+          file:
+                path: /root/github
+                state: directory
+        - name: install git
+          yum:
+                name: git
+        - name: pull code from git
+          shell: cd /root/github && git clone https://github.com/docker/getting-started.git
+
+        - shell: cd /root/github/getting-started/app
+        - name: write Dockerfile to create an image
+          blockinfile:
+                create: yes
+                path: /root/github/getting-started/app/Dockerfile
+                block: |
+                         # syntax=docker/dockerfile:1
+                         FROM node:12-alpine
+                         RUN apk add --no-cache python2 g++ make
+                         WORKDIR /app
+                         COPY . .
+                         RUN yarn install --production
+                         CMD ["node", "src/index.js"]
+                         EXPOSE 3000
+        - name: build
+          shell: docker build -t getting-started /root/github/getting-started/app
+
+        - name: install docker-compose
+          #get_url:
+           #     url: https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m`
+            #    dest: /usr/local/bin/docker-compose
+             #   mode: 755
+          shell: curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
+        - name: write docker-compose.yml
+          blockinfile:
+                create: yes
+                path: /root/github/getting-started/app/docker-compose.yml
+                block: |
+                        version: "3.7"
+
+                        services:
+                          app:
+                                image: node:12-alpine
+                                command: sh -c "yarn install && yarn run dev"
+                                ports:
+                                        - 3000:3000
+                                working_dir: /app
+                                volumes:
+                                        - ./:/app
+                                environment:
+                                  MYSQL_HOST: mysql
+                                  MYSQL_USER: root
+                                  MYSQL_PASSWORD: secret
+                                  MYSQL_DB: todos
+
+                          mysql:
+                                image: mysql:5.7
+                                volumes:
+                                        - todo-mysql-data:/var/lib/mysql
+                                environment:
+                                  MYSQL_ROOT_PASSWORD: secret
+                                  MYSQL_DATABASE: todos
+
+                        volumes:
+                          todo-mysql-data:
+        - name: create network
+          shell: docker network create todo-app
+
+        - name: connect network
+          shell: docker run -id --network todo-app nicolaka/netshoot
+        - name: excute docker-compose
+          shell: cd /root/github/getting-started/app &&  docker-compose up -d
