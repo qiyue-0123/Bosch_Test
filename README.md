@@ -4,4 +4,4 @@ This application includes MySQl service, you can link to the virtual machine by 
 and excute command "docker exec -it e8cfa9ab3503 mysql -p todos", and excute "select * from todo_items;" to see the database table information. 
 (e8cfa9ab3503 is the container id of the mysql container)
 
-The three files under Bosch_Test directory is the deployment scripts of ansible.
+The three files under Bosch_Test/ansible/ directory is the deployment scripts of ansible.
