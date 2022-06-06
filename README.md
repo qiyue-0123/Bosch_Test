@@ -13,13 +13,3 @@ The three files under Bosch_Test/ansible/ directory is the deployment scripts of
 4. Create a docker network
 5. Run a container using the nicolaka/netshoot image. Make sure to connect them to the same network.
 6. Install docker-compose and write docker-compose.yml file, then excute "docker-compose up -d".
-
-
-
-Master VM IP:
-public ip: 8.209.74.1\n
-private ip: 172.31.112.181
-
-Node VM IP:
-public ip: 47.254.147.185
-private ip: 172.31.112.180
