@@ -1,5 +1,5 @@
 # Bosch_Test
-I use ansible to deploy an app in docker container to cloud vm(alibaba cloud), you can access http://47.254.147.185:3000/ to see the "Todo" application.(This ip is valid until 2022-06-12 23:59 CST)
+I use ansible to deploy an app in docker container to a cloud vm(alibaba cloud), you can access http://47.254.147.185:3000/ to see the "Todo" application.(This ip is valid until 2022-06-12 23:59 CST)
 
 This application includes MySQl service, you can use ssh to link to the virtual machine by ip 47.254.147.185(public ip) 
 and excute command "docker exec -it efc3e6f7a7fb mysql -p todos", input password:secret, and excute "select * from todo_items;" to see the database table information. 
