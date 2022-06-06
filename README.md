@@ -17,7 +17,7 @@ The three files under Bosch_Test/ansible/ directory is the deployment scripts of
 
 
 Master VM IP:
-public ip: 8.209.74.1
+public ip: 8.209.74.1\n
 private ip: 172.31.112.181
 
 Node VM IP:
